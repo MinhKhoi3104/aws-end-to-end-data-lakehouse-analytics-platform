@@ -371,8 +371,8 @@ State files are stored in S3 bucket `data-pipeline-e2e-terraform-state`. You can
 
 - [Terraform AWS Provider Documentation](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 - [Terraform S3 Backend](https://www.terraform.io/docs/language/settings/backends/s3.html)
-- [Terrafrom S3 code tutorial](https://github.com/rahulwagh/aws-terraform-course-repo/tree/main/s3)
-- [Terrafrom Redshift code tutorial](https://github.com/KopiCloud/terraform-aws-redshift-serverless/tree/main)
+- [Terraform S3 code tutorial](https://github.com/rahulwagh/aws-terraform-course-repo/tree/main/s3)
+- [Terraform Redshift code tutorial](https://github.com/KopiCloud/terraform-aws-redshift-serverless/tree/main)
 
 ---
 
