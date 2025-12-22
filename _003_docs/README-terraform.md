@@ -12,7 +12,7 @@ This document describes the structure and usage of Terraform modules to deploy i
 
 ```
 _001_iac/terraform/
-├── bootstrap/          # First module to deploy - creates S3 backend
+├── bootstrap/          # First module to deploy - creates the S3 bucket used to store Terraform state (backend)
 ├── s3/                # Module creates S3 data lake buckets
 └── redshift/          # Module creates Redshift Serverless infrastructure
 ```
@@ -25,12 +25,23 @@ This module creates an S3 bucket to store Terraform state files. This is the **r
 ### File Structure
 - `main.tf` - Defines S3 bucket and related configurations
 - `provider.tf` - AWS provider configuration
+- `backend.tf` - S3 backend configuration 
 
 ### Resources Created
 - **S3 Bucket**: `data-pipeline-e2e-terraform-state`
   - Versioning enabled
   - Public access blocked
   - Server-side encryption (AES256)
+
+### Backend Configuration
+```hcl
+backend "s3" {
+  bucket  = "data-pipeline-e2e-terraform-state"
+  key     = "terraform/state/s3-datalake.tfstate"
+  region  = "ap-southeast-1"
+  encrypt = true
+}
+```
 
 ### How to Deploy
 
@@ -63,14 +74,13 @@ This module creates S3 buckets for the data lake, including:
 
 ### File Structure
 - `main.tf` - Defines S3 buckets and configurations
-- `backend.tf` - S3 backend configuration (uses bucket from bootstrap module)
 - `variables.tf` - Variable definitions
 
 ### Resources Created
 
 #### 1. Main Data Bucket
 - **Name**: `{bucket_name}-{random_suffix}`
-- **Default name**: `data-pipeline-e2e-datalake-{suffix}`
+- **Default name**: `data-pipeline-e2e-datalake-98c619f9`
 - **Features**:
   - Versioning enabled
   - Public access blocked
@@ -81,7 +91,7 @@ This module creates S3 buckets for the data lake, including:
   - Access logging enabled
 
 #### 2. Log Bucket
-- **Name**: `s3-access-logs-{random_suffix}`
+- **Name**: `s3-access-logs-98c619f9`
 - **Purpose**: Store access logs from main bucket
 - Public access blocked
 
@@ -91,15 +101,6 @@ This module creates S3 buckets for the data lake, including:
 |----------|------|---------|-------------|
 | `bucket_name` | string | `"data-pipeline-e2e-datalake"` | Base name for S3 data lake bucket |
 
-### Backend Configuration
-```hcl
-backend "s3" {
-  bucket  = "data-pipeline-e2e-terraform-state"
-  key     = "terraform/state/s3-datalake.tfstate"
-  region  = "ap-southeast-1"
-  encrypt = true
-}
-```
 
 ### How to Deploy
 
@@ -263,7 +264,7 @@ This module has the following dependencies:
 
 2. **Security**: 
    - Current security group allows access from `0.0.0.0/0`. Should be restricted in production.
-   - File `terraform.tfvars` contains sensitive data (password) and is ignored in `.gitignore`.
+   - File `terraform.tfvars` contains sensitive data (password).
 
 3. **Network**: 
    - Module automatically creates Internet Gateway and Route Tables to support public access.
@@ -305,7 +306,7 @@ Modules must be deployed in the following order:
 - ✅ Public access blocked
 
 ### 2. Sensitive Data
-- ✅ `terraform.tfvars` is ignored in `.gitignore`
+- ⚠️ `terraform.tfvars` is not ignored in `.gitignore`
 - ✅ Passwords marked as `sensitive = true`
 - ⚠️ Should use AWS Secrets Manager or Parameter Store for production
 
@@ -386,7 +387,7 @@ If you encounter issues, check:
 
 ---
 
-**Last Updated**: 2024
+**Last Updated**: 2025-12-27
 **Terraform Version**: >= 1.0
 **AWS Provider Version**: >= 5.0
 
