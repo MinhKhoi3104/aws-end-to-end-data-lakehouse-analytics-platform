@@ -4,17 +4,26 @@ config_path = os.path.join(current_dir, '..')
 config_path = os.path.abspath(config_path)
 sys.path.insert(0, config_path)
 from pyspark.sql import SparkSession
-from _00201_config._0020102_database_config import *
+from _01_config.database_config import *
+from _01_config.jar_paths import *
 
-def create_spark_session(appName):
-    spark = SparkSession.builder \
-                .appName(appName) \
-                .config("spark.driver.extraClassPath", REDSHIFT_JDBC_JAR_PATH) \
-                .getOrCreate()
+# Using to create spark session at Bronze Layer
+def create_spark_s3_session(appName):
+    spark = (
+            SparkSession.builder
+            .appName(appName)
+            .config("spark.jars", f"{HADOOP_AWS_JAR_PATH},{AWS_JAVA_SDK_BUNDLE_JAR_PATH}")
+            .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+            .config(
+                "spark.hadoop.fs.s3a.aws.credentials.provider",
+                "com.amazonaws.auth.profile.ProfileCredentialsProvider"
+            )
+            .getOrCreate()
+        )
     return spark
 
+# Execute SQL DDL/DML directly in Redshift
 def execute_sql_ddl(spark, sql_query):
-    """Thực thi câu lệnh SQL DDL/DML trực tiếp lên Redshift"""
     jvm = spark._jvm
 
     try:
@@ -37,32 +46,73 @@ def execute_sql_ddl(spark, sql_query):
             connection.close()
 
 
-
-def create_spark_session_iceberg(appName):
+# Using to create spark session at Silver Layer
+def create_spark_iceberg_session(appName):
     """
-    SparkSession với Iceberg catalog cho Silver/Gold
-    - Metadata lưu trên Glue Catalog
-    - Data files lưu trên S3
-    - Redshift chỉ dùng COPY từ S3
+    Create Spark session for Silver Layer - S3 + Iceberg
+    Args:
+        appName: Application name
+        warehouse_path: S3 path for Iceberg warehouse (ex: s3a://bucket/iceberg-warehouse)
     """
-    
     spark = (
         SparkSession.builder
         .appName(appName)
-        # JDBC jar path nếu muốn query Redshift trực tiếp
-        .config("spark.driver.extraClassPath", REDSHIFT_JDBC_JAR_PATH)
+        # JARs cho S3
+        .config("spark.jars", 
+                f"{HADOOP_AWS_JAR_PATH},"
+                f"{AWS_JAVA_SDK_BUNDLE_JAR_PATH},"
+                f"{ICEBERG_SPARK_RUNTIME_JAR_PATH}")
         
-        # Iceberg extensions
-        .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
+        # S3 configs
+        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        .config(
+            "spark.hadoop.fs.s3a.aws.credentials.provider",
+            "com.amazonaws.auth.profile.ProfileCredentialsProvider"
+        )
         
-        # Catalog kiểu Glue
-        .config("spark.sql.catalog.glue_catalog", "org.apache.iceberg.spark.SparkCatalog")
-        .config("spark.sql.catalog.glue_catalog.catalog-impl", "org.apache.iceberg.aws.glue.GlueCatalog")
+        # Iceberg configs
+        .config("spark.sql.extensions", 
+                "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
+        .config("spark.sql.catalog.spark_catalog", 
+                "org.apache.iceberg.spark.SparkSessionCatalog")
+        .config("spark.sql.catalog.spark_catalog.type", "hive")
+        .config("spark.sql.catalog.local", 
+                "org.apache.iceberg.spark.SparkCatalog")
+        .config("spark.sql.catalog.local.type", "hadoop")
+        .config("spark.sql.catalog.local.warehouse", "s3a://data-pipeline-e2e-datalake-98c619f9/iceberg-warehouse")
         
-        # Warehouse trên S3
-        .config("spark.sql.catalog.glue_catalog.warehouse", "s3://my-iceberg-warehouse/")  
+        # Optional: Enable Iceberg features
+        .config("spark.sql.catalog.local.io-impl", 
+                "org.apache.iceberg.aws.s3.S3FileIO")
         
         .getOrCreate()
     )
-    
+    return spark
+
+# Using to create spark session at Silver Layer
+def create_spark_redshift_session(appName):
+    """Gold: Redshift + Iceberg"""
+    spark = (
+        SparkSession.builder
+        .appName(appName)
+        .config("spark.jars", 
+                f"{HADOOP_AWS_JAR_PATH},{AWS_JAVA_SDK_BUNDLE_JAR_PATH},"
+                f"{ICEBERG_SPARK_RUNTIME_JAR_PATH},{REDSHIFT_JDBC_JAR_PATH},{SPARK_REDSHIFT_JAR_PATH}")
+        .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
+        .config("spark.hadoop.fs.s3a.aws.credentials.provider",
+                "com.amazonaws.auth.profile.ProfileCredentialsProvider")
+        .config("spark.sql.extensions", 
+                "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
+        .config("spark.sql.catalog.local", "org.apache.iceberg.spark.SparkCatalog")
+        .config("spark.sql.catalog.local.type", "hadoop")
+        .config("spark.sql.catalog.local.warehouse", "s3a://data-pipeline-e2e-datalake-98c619f9/iceberg-warehouse")
+        .config("spark.sql.catalog.local.io-impl", "org.apache.iceberg.aws.s3.S3FileIO")
+        .config("spark.databricks.redshift.jdbc.url", REDSHIFT_JDBC['url'])
+        .config("spark.databricks.redshift.tempdir", REDSHIFT_JDBC['tempdir'])
+        .getOrCreate()
+    )
+
+    # set log level WARN to reduce unnessary uotput line
+    spark.sparkContext.setLogLevel("WARN")
+
     return spark
