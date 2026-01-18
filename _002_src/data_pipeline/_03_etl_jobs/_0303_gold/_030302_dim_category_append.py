@@ -147,19 +147,11 @@ def _030302_dim_category_append(etl_date=None):
         """
         # Read data from iceberg
         ib_df = spark.sql("SELECT * FROM iceberg.gold.dim_category")
-
-        if insert_records_count > 0:
-
-            print(f'===== The number of insert records: {insert_records_count} =====')
-
-            # LOAD
-            write_to_redshift(ib_df, "gold.dim_category","overwrite")
-            print("===== ✅ Completely insert new records into Readshift: gold.dim_category! =====")
-
-        else:
-            print('===== No records need to insert! =====')
         
-
+        # LOAD
+        write_to_redshift(ib_df, "gold.dim_category","overwrite")
+        print("===== ✅ Completely insert new records into Readshift: gold.dim_category! =====")
+        
         return True
 
     except Exception as e:
