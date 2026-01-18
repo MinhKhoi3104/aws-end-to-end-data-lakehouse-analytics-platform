@@ -3,7 +3,6 @@ current_dir = os.path.dirname(__file__)
 config_path = os.path.join(current_dir, '..','..','..','..')
 config_path = os.path.abspath(config_path)
 sys.path.insert(0, config_path)
-from _002_src.data_pipeline._01_config.jar_paths import * 
 from _002_src.data_pipeline._02_utils.utils import *
 from _002_src.data_pipeline._02_utils.surrogate_key_registry import *
 from datetime import date
@@ -109,14 +108,18 @@ def _030306_dim_subscription_append(etl_date=None):
         );"""
         execute_sql_ddl(spark,sql_query)
 
+        # Load to Redshift
+        """
+        Read data from iceberg and insert to Redshift
+        """
         # Read data from iceberg
         ib_df = spark.sql("SELECT * FROM iceberg.gold.dim_subscription")
         
         # LOAD
         write_to_redshift(ib_df, "gold.dim_subscription","append")
-        print("===== ✅ Completely insert new records into Readshift: gold.dim_subscription! =====")
-        
+        print("===== ✅ Completely insert new records into Redshift: gold.dim_subscription! =====")
         return True
+
 
 
     except Exception as e:
