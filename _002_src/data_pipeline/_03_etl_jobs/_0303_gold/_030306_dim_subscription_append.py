@@ -1,5 +1,7 @@
 import os, sys
 current_dir = os.path.dirname(__file__)
+os.environ['PYSPARK_PYTHON'] = sys.executable
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 config_path = os.path.join(current_dir, '..','..','..','..')
 config_path = os.path.abspath(config_path)
 sys.path.insert(0, config_path)
@@ -15,9 +17,9 @@ def _030306_dim_subscription_append(etl_date=None):
     try:
         # Default etl_date = today
         if etl_date is None:
-            config_etl_date = date.today().strftime("%Y%m%d")
+            etl_date = date.today().strftime("%Y%m%d")
         else:
-            config_etl_date = str(etl_date)
+            etl_date = str(etl_date)
 
         # Create spark session
         spark = create_gold_spark_session("_030306_dim_subscription_append")
@@ -45,7 +47,7 @@ def _030306_dim_subscription_append(etl_date=None):
         USING iceberg;
         """)
 
-        # Normalize
+        # Normalize and Logic
         # plan_name: lower(trim(plan_name))
         # plan_type: lower(trim(plan_type))
         # is_paid: case when lower(trim(plan_type)) = 'giftcode' then 0 else 1 end
@@ -109,24 +111,15 @@ def _030306_dim_subscription_append(etl_date=None):
         );"""
         execute_sql_ddl(spark,sql_query)
 
-        """
-        Read data from iceberg and insert to Redshift
-        """
-
-        # Load to Redshift
-        if insert_records_count > 0:
-
-            print(f'===== The number of insert records: {insert_records_count} =====')
-
-            # LOAD
-            write_to_redshift(insert_df, "gold.dim_subscription","append")
-            print("===== ✅ Completely insert new records into Redshift: gold.dim_subscription! =====")
-
-        else:
-            print('===== No records need to insert! =====')
+        # Read data from iceberg
+        ib_df = spark.sql("SELECT * FROM iceberg.gold.dim_subscription")
         
-
+        # LOAD
+        write_to_redshift(ib_df, "gold.dim_subscription","append")
+        print("===== ✅ Completely insert new records into Readshift: gold.dim_subscription! =====")
+        
         return True
+
 
     except Exception as e:
         print(f"❌ ERROR: {e}")
