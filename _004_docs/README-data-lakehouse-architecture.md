@@ -3,7 +3,9 @@
 ## 📋 General
 This project applies the **Medallion Architecture**, organizing data processing into three layers: Bronze, Silver, and Gold. Each layer enforces specific transformation and data quality rules before passing data to the next stage.
 
-![Medallion_Architect](/image/Medallion_Architect.png)
+<p align="center">
+  <img src="/image/Medallion_Architect.png" alt="Medallion Architect" />
+</p>
 <p align="center">
   <em>Medallion Architect</em>
 </p>
