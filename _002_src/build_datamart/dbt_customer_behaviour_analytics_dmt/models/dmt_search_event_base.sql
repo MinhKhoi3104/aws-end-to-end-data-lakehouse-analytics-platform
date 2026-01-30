@@ -9,12 +9,12 @@ SELECT
     date.day_of_week,
 
     CASE
-        WHEN EXTRACT(HOUR FROM fact.datetime_log::timestamp) BETWEEN 0 AND 4  THEN 'Late Night'
-        WHEN EXTRACT(HOUR FROM fact.datetime_log::timestamp) BETWEEN 5 AND 7  THEN 'Early Morning'
-        WHEN EXTRACT(HOUR FROM fact.datetime_log::timestamp) BETWEEN 8 AND 11 THEN 'Morning'
-        WHEN EXTRACT(HOUR FROM fact.datetime_log::timestamp) BETWEEN 12 AND 13 THEN 'Lunch'
-        WHEN EXTRACT(HOUR FROM fact.datetime_log::timestamp) BETWEEN 14 AND 18 THEN 'Afternoon'
-        WHEN EXTRACT(HOUR FROM fact.datetime_log::timestamp) BETWEEN 19 AND 21 THEN 'Prime Time'
+        WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 0 AND 4  THEN 'Late Night'
+        WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 5 AND 7  THEN 'Early Morning'
+        WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 8 AND 11 THEN 'Morning'
+        WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 12 AND 13 THEN 'Lunch'
+        WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 14 AND 18 THEN 'Afternoon'
+        WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 19 AND 21 THEN 'Prime Time'
         ELSE 'Night'
     END AS time_slot,
 
@@ -25,14 +25,13 @@ SELECT
 
         WHEN EXISTS (
             SELECT 1
-            FROM {{ source('gold', 'bridge_user_plan') }} b
-            WHERE b.user_id = fact.user_id
-            AND to_date(b.first_effective_date, 'YYYY-MM-DD')
+            FROM {{ source('gold', 'bridge_user_plan') }} bridge
+            WHERE bridge.user_id = fact.user_id
+            AND bridge.first_effective_date
                 <= fact.datetime_log::date
             AND (
-                    b.recent_effective_date IS NULL
-                    OR to_date(b.recent_effective_date, 'YYYY-MM-DD')
-                    >= fact.datetime_log::date
+                    bridge.recent_effective_date IS NULL
+                    OR bridge.recent_effective_date >= fact.datetime_log::date
             )
         ) THEN 'plan'
 

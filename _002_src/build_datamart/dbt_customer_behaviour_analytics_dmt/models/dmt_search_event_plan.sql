@@ -1,22 +1,13 @@
 {{ config(materialized='table') }}
 
-WITH dim_date_casted AS (
+WITH search_user_month AS (
 
     SELECT
-        date_key,
-        to_date(date, 'YYYY-MM-DD') AS full_date
-    FROM {{ source('gold', 'dim_date') }}
-
-),
-
-search_user_month AS (
-
-    SELECT
-        date_trunc('month', date_casted.full_date) AS month_key,
+        date_trunc('month', date.date) AS month_key,
         fact.user_id
     FROM {{ source('gold', 'fact_customer_search') }} fact
-    JOIN dim_date_casted date_casted
-        ON fact.date_key = date_casted.date_key
+    JOIN {{ source('gold', 'dim_date') }} date
+        ON fact.date_key = date.date_key
     WHERE fact.category = 'enter'
     GROUP BY 1, 2
 
@@ -26,8 +17,8 @@ plan_with_subscription AS (
 
     SELECT
         bridge.user_id,
-        to_date(bridge.first_effective_date, 'YYYY-MM-DD') AS first_effective_date,
-        to_date(bridge.recent_effective_date, 'YYYY-MM-DD') AS recent_effective_date,
+        bridge.first_effective_date,
+        bridge.recent_effective_date,
         subscription.plan_name,
         subscription.plan_type
     FROM {{ source('gold', 'bridge_user_plan') }} bridge
