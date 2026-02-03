@@ -1758,7 +1758,7 @@
   "preload": false,
   "refresh": "",
   "schemaVersion": 42,
-  "tags": [],
+  "tags": ["airflow"],
   "templating": {
     "list": [
       {
@@ -1781,7 +1781,7 @@
     ]
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
