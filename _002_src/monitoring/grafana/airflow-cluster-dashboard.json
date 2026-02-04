@@ -776,7 +776,7 @@
           "refId": "A"
         }
       ],
-      "title": "Operator success rate per minuite",
+      "title": "Operator success rate per minute",
       "type": "timeseries"
     },
     {
@@ -784,7 +784,7 @@
         "type": "prometheus",
         "uid": "cfboz46pwz08wd"
       },
-      "description": "Total failures of given operator",
+      "description": "Failure rate per operator per minute",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1363,7 +1363,7 @@
         "type": "prometheus",
         "uid": "cfboz46pwz08wd"
       },
-      "description": "Seconds taken for a DagRun to reach success state",
+      "description": "Milliseconds taken for a DagRun to reach success state",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1460,7 +1460,7 @@
         "type": "prometheus",
         "uid": "cfboz46pwz08wd"
       },
-      "description": "Seconds taken for a DagRun to reach failed state",
+      "description": "Milliseconds taken for a DagRun to reach failed state",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1658,7 +1658,7 @@
         "type": "prometheus",
         "uid": "cfboz46pwz08wd"
       },
-      "description": "Seconds taken to check DAG dependencies",
+      "description": "Milliseconds taken to check DAG dependencies",
       "fieldConfig": {
         "defaults": {
           "color": {
