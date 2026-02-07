@@ -148,18 +148,33 @@ Datamart database includes three tables supporting monthly analytics. These tabl
 - dmt_search_event_base.sql
 - dmt_search_event_plan.sql
 - dmt_search_event_category.sql
-<img src="datamart.png">
+
+![datamart](/image/datamart.png)
+<p align="center">
+  <em> Datamart of the project</em>
+</p>
 
 All models are materialized as table since table is fast to query. Each table serves particularly analytical purposes. 
 
 The dmt_search_event_base's grain is one search event per row and only events with action 'enter' are chosen to analyse. This datamart is the aggregation of 6/8 gold layer's tables and used for most charts of the monthly report. 
-<img src="base.png">
 
-The dmt_search_event_category's grain is one category of a search event per row. Since a search event may have more than one category and we want to analyse both main and sub category, we need to explode a search event into multiple rows. Some search events having main category defined as 'not matched' will be filtered out. This datamart serves analytical charts related to category such as 'Top category in a month'.
-<img src="category.png">
+![base](/image/base.png)
+<p align="center">
+  <em> Datamart search event base table</em>
+</p>
+
+The dmt_search_event_category's grain is one category of a search event per row. This table' reference is the dmt_search_event_base. Since a search event may have more than one category and we want to analyse both main and sub category, we need to explode a search event into multiple rows. Some search events having main category defined as 'not matched' will be filtered out. This datamart serves analytical charts related to category such as 'Top category in a month'.
+
+![category](/image/category.png)
+<p align="center">
+  <em> Datamart search event category table</em>
+</p>
 
 The dmt_search_event_plan's grain is a plan type of a plan name per row. This table is used to visualize 'Top plan x plan type in a month' chart.
-<img src="plan.png">
+![plan](/image/plan.png)
+<p align="center">
+  <em> Datamart search event plan table</em>
+</p>
 
 **Schema of models:**\
 Schema is written in schema.yml. It defines:
@@ -186,11 +201,20 @@ dbt-postgres==1.7.13
 
 5. Use ‘dbt run’ to create datamart tables by SQL files in models folder.
 <img src="dbt_run.png">
+![dbt_run](/image/dbt_run.png)
+<p align="center">
+  <em> Terminal output of 'dbt run'</em>
+</p>
+
 
 6. Use ‘dbt test’ to test the model outputs. All tests are defined in the schema.yml file.
 <img src="dbt_test.png">
+![dbt_test](/image/dbt_test.png)
+<p align="center">
+  <em> Terminal output of 'dbt test'</em>
+</p>
 
-## ✅ Specific Benefits in the Projectf
+## ✅ Specific Benefits in the Project
 1. Centralized Business Logic
 All transformation logic is defined once in dbt models instead of being duplicated across BI tools. This ensures consistency across all dashboards.
 
