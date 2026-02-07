@@ -326,29 +326,6 @@ Modules must be deployed in the following order:
 
 ---
 
-## 🛠️ Troubleshooting
-
-### Issue: Terraform hangs when modifying Redshift
-**Cause**: Redshift Serverless modify operations may take 10-30 minutes.
-
-**Solution**:
-- Check AWS Console to view resource status
-- Check CloudWatch Logs for errors
-- Run `terraform plan` first to preview changes
-- Ensure all dependencies are created (IGW, route tables, etc.)
-
-### Issue: Module cannot find S3 backend
-**Cause**: Bootstrap module has not been deployed.
-
-**Solution**: Deploy bootstrap module first.
-
-### Issue: Insufficient availability zones for subnets
-**Cause**: Region does not have 3 AZs or data source error.
-
-**Solution**: Check `data.aws_availability_zones.available` and ensure region has enough AZs.
-
----
-
 ## 📝 Maintenance
 
 ### Update Variables
@@ -379,20 +356,3 @@ State files are stored in S3 bucket `data-pipeline-e2e-terraform-state`. You can
 - [Terraform S3 Backend](https://www.terraform.io/docs/language/settings/backends/s3.html)
 - [Terraform S3 code tutorial](https://github.com/rahulwagh/aws-terraform-course-repo/tree/main/s3)
 - [Terraform Redshift code tutorial](https://github.com/KopiCloud/terraform-aws-redshift-serverless/tree/main)
-
----
-
-## 📞 Support
-
-If you encounter issues, check:
-1. AWS credentials are configured correctly
-2. IAM permissions are sufficient to create resources
-3. Region has enough availability zones
-4. Terraform version is compatible (>= 1.0)
-
----
-
-**Last Updated**: 2025-12-27
-**Terraform Version**: >= 1.0
-**AWS Provider Version**: >= 5.0
-
