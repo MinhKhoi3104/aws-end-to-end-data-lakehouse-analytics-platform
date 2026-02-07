@@ -3,7 +3,10 @@
 WITH base AS (
 
     SELECT
+<<<<<<< HEAD
         event_id,
+=======
+>>>>>>> 2edeb30c7e0779508b73f9ceb592d70c62179153
         date_key,
         month,
         year,
@@ -24,7 +27,10 @@ WITH base AS (
 category_exploded AS (
 
     SELECT DISTINCT
+<<<<<<< HEAD
         b.event_id,
+=======
+>>>>>>> 2edeb30c7e0779508b73f9ceb592d70c62179153
         b.date_key,
         b.month,
         b.year,

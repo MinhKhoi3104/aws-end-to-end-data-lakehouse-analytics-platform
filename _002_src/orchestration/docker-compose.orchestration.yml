@@ -24,6 +24,11 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
     AIRFLOW__CORE__DEFAULT_TIMEZONE: Asia/Ho_Chi_Minh
     PYTHONPATH: /opt/airflow:/opt/airflow/data_pipeline
+    AIRFLOW__METRICS__STATSD_ON: "True"
+    AIRFLOW__METRICS__STATSD_HOST: statsd-exporter
+    AIRFLOW__METRICS__STATSD_PORT: "9125"
+    AIRFLOW__METRICS__STATSD_PREFIX: airflow
+    AIRFLOW__METRICS__STATSD_ALLOW_LIST: scheduler,executor,dagrun,ti
   volumes:
     - ./dags:/opt/airflow/dags
     - ./data_pipeline:/opt/airflow/data_pipeline

@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.38.0
+    container_name: prometheus
+    restart: always
+    user: root
+    volumes:
+      - ./_002_src/monitoring/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - "9090:9090"
+    networks:
+      - aws_e2e_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    user: root
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_USERS_ALLOW_SIGN_UP=false
+    ports:
+      - "3000:3000"
+    networks:
+      - aws_e2e_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      retries: 10
+
+  statsd-exporter:
+    image: prom/statsd-exporter
+    container_name: statsd-exporter
+    volumes:
+      - ./_002_src/monitoring/config/statsd.yml:/home/statsd-mapping-configs.yml
+    entrypoint: ["/bin/sh", "-c", "--"]
+    command: ["statsd_exporter --log.level debug --statsd.mapping-config=/home/statsd-mapping-configs.yml"]
+    restart: always
+    ports:
+      - "9125:9125/udp"
+      - "9102:9102"
+    networks:
+      - aws_e2e_network
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  aws_e2e_network:
+    external: true
