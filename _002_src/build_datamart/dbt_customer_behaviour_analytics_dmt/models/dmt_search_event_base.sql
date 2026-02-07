@@ -9,7 +9,7 @@ SELECT
     date.day_of_week,
 
     CASE
-        WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 0 AND 4  THEN 'Late Night'
+        WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 1 AND 4  THEN 'Late Night'
         WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 5 AND 8  THEN 'Early Morning'
         WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 9 AND 12 THEN 'Morning'
         WHEN EXTRACT(HOUR FROM fact.datetime_log) BETWEEN 13 AND 16 THEN 'Afternoon'
