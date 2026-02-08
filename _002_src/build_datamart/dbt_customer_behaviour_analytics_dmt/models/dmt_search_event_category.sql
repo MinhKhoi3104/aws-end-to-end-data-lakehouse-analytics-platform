@@ -3,6 +3,7 @@
 WITH base AS (
 
     SELECT
+        event_id,
         date_key,
         month,
         year,
@@ -23,6 +24,7 @@ WITH base AS (
 category_exploded AS (
 
     SELECT DISTINCT
+        b.event_id,
         b.date_key,
         b.month,
         b.year,
