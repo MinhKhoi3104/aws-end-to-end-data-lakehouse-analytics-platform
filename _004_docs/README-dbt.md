@@ -109,8 +109,8 @@ models:
 
 ### Core Components
 **Source of models:**\
-Datamart is built from the gold layer of the data warehouse. In this project, gold layer is stored in postgreSQL database.\
-```python
+Datamart is built from the gold layer of the data warehouse. In this project, gold layer is replicated from Redshift to PostgreSQL database and stored in 'dwh_user_search' schema. The datamart built by dbt is stored in 'datamart' schema of PostgreSQL.\
+``` python
 sources:
   - name: gold
     description: "Gold layer tables stored in PostgreSQL"
@@ -163,7 +163,7 @@ The dmt_search_event_base's grain is one search event per row and only events wi
   <em> Datamart search event base table</em>
 </p>
 
-The dmt_search_event_category's grain is one category of a search event per row. This table' reference is the dmt_search_event_base. Since a search event may have more than one category and we want to analyse both main and sub category, we need to explode a search event into multiple rows. Some search events having main category defined as 'not matched' will be filtered out. This datamart serves analytical charts related to category such as 'Top category in a month'.
+The dmt_search_event_category's grain is one category of a search event per row. This table's reference is the dmt_search_event_base. Since a search event may have more than one category and we want to analyse both main and sub category, we need to explode a search event into multiple rows. Some search events having main category defined as 'not matched' will be filtered out. This datamart serves analytical charts related to category such as 'Top category in a month'.
 
 ![category](/image/category.png)
 <p align="center">
@@ -177,7 +177,7 @@ The dmt_search_event_plan's grain is a plan type of a plan name per row. This ta
 </p>
 
 **Schema of models:**\
-Schema is written in schema.yml. It defines:
+Schema is written in 'schema.yml'. It defines:
 - Model’s name
 - Model’s description
 - Column's name
@@ -189,26 +189,59 @@ Schema is written in schema.yml. It defines:
 dbt-core==1.7.13
 dbt-postgres==1.7.13
 
-2. Create profile.yml to store data warehouse connection settings.
+2. Open a new terminal and run these following commands:
+```
+# Manually create the .dbt directory and set up profile.yml file
+mkdir -p ~/.dbt;
+# open folder dbt
+cd ~/.dbt/ ; code .
+```
+Then set up the dbt profile configuration in '.dbt' file.
+``` python
+dbt_customer_behaviour_analytics_dmt:
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: admin
+      password: "admin"
+      dbname: postgres
+      schema: datamart
 
-3. Create dbt_project.yml to define:
+    prod:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: admin
+      password: "admin"
+      dbname: postgres
+      schema: datamart
+
+  target: dev
+```
+
+3. Set up 'dbt_project.yml' file to define:
 - project name
 - version
 - profile name
 - model paths and materialization settings
 
-4. Define source and models
+4. Define source, SQL models amd schema in 'models' folder. 
 
-5. Use ‘dbt run’ to create datamart tables by SQL files in models folder.
-<img src="dbt_run.png">
+5. In the terminal, change directory to the 'dbt_customer_behaviour_analytics_dmt' folder in _002_src/build_datamart:
+``` 
+cd ~\aws-end-to-end-data-lakehouse-analytics-platform\_002_src\build_datamart\dbt_customer_behaviour_analytics_dmt
+
+```
+
+6. Use ‘dbt run’ to create datamart tables by SQL files in 'models' folder.
 ![dbt_run](/image/dbt_run.png)
 <p align="center">
   <em> Terminal output of 'dbt run'</em>
 </p>
 
-
-6. Use ‘dbt test’ to test the model outputs. All tests are defined in the schema.yml file.
-<img src="dbt_test.png">
+7. Use ‘dbt test’ to test the model outputs. All tests are defined in the 'schema.yml' file of 'models' folder.
 ![dbt_test](/image/dbt_test.png)
 <p align="center">
   <em> Terminal output of 'dbt test'</em>
