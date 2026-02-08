@@ -185,18 +185,21 @@ Schema is written in 'schema.yml'. It defines:
 - Data test to validate outputs. In this project, we used 3 main tests including not null, unique and accepted values.
 
 ## 💻 TO USE DBT
-1. Install required packages: 
-dbt-core==1.7.13
-dbt-postgres==1.7.13
+1. Navigate to the `build_datamart` directory and run the following commands:
+ 
+```bash
+pip install -r requirements.txt
+```
 
 2. Open a new terminal and run these following commands:
-```
+```bash
 # Manually create the .dbt directory and set up profile.yml file
 mkdir -p ~/.dbt;
 # open folder dbt
 cd ~/.dbt/ ; code .
+
 ```
-Then set up the dbt profile configuration in '.dbt' file.
+Create profile.yml and add this content into profile.yml
 ``` python
 dbt_customer_behaviour_analytics_dmt:
   outputs:
@@ -221,27 +224,19 @@ dbt_customer_behaviour_analytics_dmt:
   target: dev
 ```
 
-3. Set up 'dbt_project.yml' file to define:
-- project name
-- version
-- profile name
-- model paths and materialization settings
-
-4. Define source, SQL models amd schema in 'models' folder. 
-
-5. In the terminal, change directory to the 'dbt_customer_behaviour_analytics_dmt' folder in _002_src/build_datamart:
-``` 
+3. In the terminal, change directory to the 'dbt_customer_behaviour_analytics_dmt' folder in _002_src/build_datamart:
+```bash
 cd ~\aws-end-to-end-data-lakehouse-analytics-platform\_002_src\build_datamart\dbt_customer_behaviour_analytics_dmt
 
 ```
 
-6. Use ‘dbt run’ to create datamart tables by SQL files in 'models' folder.
+4. Use ‘dbt run’ to create datamart tables by SQL files in 'models' folder.
 ![dbt_run](/image/dbt_run.png)
 <p align="center">
   <em> Terminal output of 'dbt run'</em>
 </p>
 
-7. Use ‘dbt test’ to test the model outputs. All tests are defined in the 'schema.yml' file of 'models' folder.
+5. Use ‘dbt test’ to test the model outputs. All tests are defined in the 'schema.yml' file of 'models' folder.
 ![dbt_test](/image/dbt_test.png)
 <p align="center">
   <em> Terminal output of 'dbt test'</em>
