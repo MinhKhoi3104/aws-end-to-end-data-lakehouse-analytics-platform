@@ -171,3 +171,7 @@ This dashboard monitors **PostgreSQL performance** used in the platform, via met
   - `_002_src/monitoring/grafana/postgresql-dashboard.json`
 - Select the correct **Prometheus datasource** in Grafana so the dashboards start showing data.
 
+## 📚 References
+- [Airflow Dashboard Code Template](https://github.com/databand-ai/airflow-dashboards)
+- [Postgres Exporter Code Template](https://github.com/prometheus-community/postgres_exporter)
+

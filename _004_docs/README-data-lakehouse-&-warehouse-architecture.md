@@ -1,4 +1,4 @@
-# AWS Data Lakehouse 
+# AWS Data Lakehouse & Warehouse
 
 ## 📋 General
 This project applies the **Medallion Architecture**, organizing data processing into three layers: Bronze, Silver, and Gold. Each layer enforces specific transformation and data quality rules before passing data to the next stage.
