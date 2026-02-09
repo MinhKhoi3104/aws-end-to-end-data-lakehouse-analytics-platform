@@ -196,7 +196,7 @@ pip install -r requirements.txt
 # Manually create the .dbt directory and set up profile.yml file
 mkdir -p ~/.dbt;
 # open folder dbt
-cd ~/.dbt/ ; code .
+cd ~/.dbt/ && code .
 
 ```
 Create profile.yml and add this content into profile.yml

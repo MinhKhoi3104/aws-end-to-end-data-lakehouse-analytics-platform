@@ -250,7 +250,7 @@ terraform init
 # Plan changes
 terraform plan
 
-# Apply changes (⚠️ may take 10-30 minutes)
+# Apply changes
 terraform apply
 ```
 
