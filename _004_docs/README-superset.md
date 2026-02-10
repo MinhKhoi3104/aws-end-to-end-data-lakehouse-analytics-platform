@@ -2,7 +2,7 @@
 
 ## 📋 GENERAL
 
-Apache Superset is a modern, enterprise-ready data exploration and visualization platform. In this project, it serves as the **Business Intelligence (BI)** layer, allowing users to visualize data stored in the Data Warehouse (PostgreSQL) and Data Lakehouse (Iceberg/Trino). It replaces traditional BI tools by providing an open-source, code-first analytics experience.
+Apache Superset is a modern, enterprise-ready data exploration and visualization platform. In this project, it serves as the **Business Intelligence (BI)** layer, allowing users to visualize data stored in the Data Warehouse (PostgreSQL) and Data Lakehouse. It replaces traditional BI tools by providing an open-source, code-first analytics experience.
 
 ## 🎯 WHY USING SUPERSET
 
@@ -24,22 +24,18 @@ Apache Superset is a modern, enterprise-ready data exploration and visualization
     *   Integrates with major authentication backends (database, OpenID, LDAP, etc.).
 
 ## 🏗️ ARCHITECTURE AND CONFIGURATION
-
 ### Architecture
-
-The superset project structure is minimal as most configuration is handled via Docker and the UI/Database state.
+**Project Structure:**
+The Superset project structure is minimal as most configuration is handled via Docker and the UI/Database state.
 
 ```
-aws-end-to-end-dwh-analytics-platform/
+aws-end-to-end-data-lakehouse-analytics-platform/
 │
-├── _002_src/
-│   └── superset/
-│       └── docker/           # Docker specific scripts (bootstrapping)
-│
-├── docker-compose.superset.yml # Main service definition
+├── docker-compose.superset.yml
 └── docker/
     └── .env                    # Environment variables (credentials, config)
 ```
+
 
 The Superset deployment consists of the following services:
 
@@ -157,6 +153,9 @@ docker-compose -f docker-compose.superset.yml up -d
 *   Add native filters (e.g., Date Range) to make it interactive.
 *   Save and Publish.
   <img width="698" height="2048" alt="image" src="https://github.com/user-attachments/assets/822a5089-1e66-4508-82d4-1b1e5ba13e47" />
+
+- [Dashboard Chart Definitions](https://docs.google.com/document/d/17wnCi0x2o2l7_Pr2SJLdNvUvm5-WZAUlE13CiHlYsEM/edit?usp=sharing)
+
 
 ---
 ## 📚 REFERENCES
