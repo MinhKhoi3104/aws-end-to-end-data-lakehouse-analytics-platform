@@ -1,7 +1,7 @@
 # 🚀 AWS End-to-End Data Lakehouse Analytics Platform
 
 <p align="center">
-  <a href="https://github.com/MinhKhoi3104/aws-end-to-end-data-lakehouse-analytics-platform/tree/main/README/#-quick-start-guide">
+  <a href="https://github.com/MinhKhoi3104/aws-end-to-end-data-lakehouse-analytics-platform/tree/main?tab=readme-ov-file#-quick-start-guide">
   <img src="https://img.shields.io/badge/project-🚀quick_start-blue?style=for-the-badge&logo=github" alt="Quick Start Guide"/>
 </a>
   <a href="https://github.com/MinhKhoi3104/aws-end-to-end-data-lakehouse-analytics-platform/tree/main/_002_src">
@@ -39,24 +39,24 @@ The Gold-layer datasets are then **replicated into PostgreSQL**, which serves as
 - [📁 Project Structure](#-project-structure)
 - [📚 Dataset](#-dataset)
   - [Customer search data log](#customer-search-data-log)
-  - [Crawled data from film website](#crawled-data-from-film-website)
+  - [Crawled Movie Dataset](#crawled-movie-dataset)
 - [🌐 Architecture Overview](#-architecture-overview)
-  - [1. AWS Configuration (Infrastructure as Code - Terraform)](#-aws-configuration-)
+  - [1. AWS Configuration (Infrastructure as Code - Terraform)](#1-aws-configuration-infrastructure-as-code---terraform)
   - [2. Distributed Batch Processing](#2-distributed-batch-processing)
   - [3. Monitoring & Observability](#3-monitoring--observability)
   - [4. Datamart for business analytics and reporting](#4-datamart-for-business-analytics-and-reporting)
   - [5. Business Intelligence & Visualization](#5-business-intelligence--visualization)
 - [🚀 Quick Start Guide](#-quick-start-guide)
-  - [Step 1: Infrastructure Setup with Terraform](#step-1-infrastructure-sepup-with-terraform)
+  - [Step 1: Infrastructure Setup with Terraform](#step-1-infrastructure-setup-with-terraform)
   - [Step 2: Create Docker Network](#step-2-create-docker-network)
   - [Step 3: Start PostgreSQL and Monitoring Services](#step-3-start-postgresql-and-monitoring-services)
   - [Step 4: Configure Airflow Environment](#step-4-configure-airflow-environment)
   - [Step 5: Build and Start Airflow](#step-5-build-and-start-airflow)
-  - [Step 6: Import Grafana Dashboards](#step-4-configure-airflow-environment)
+  - [Step 6: Import Grafana Dashboards](#step-6-import-grafana-dashboards)
   - [Step 7: Run Data Pipeline](#step-7-run-data-pipeline)
   - [Step 8: Replicate Data to PostgreSQL](#step-8-replicate-data-to-postgresql)
   - [Step 9: Build Datamart with dbt](#step-9-build-datamart-with-dbt)
-  - [Step 10: Visualize data by Apache Superset and Reporting](#step-10-visualize-data-by-apache-superset-and-reporting)
+  - [Step 10: Business Intelligence & Visualization by Apache Superset](#step-10-business-intelligence--visualization-by-apache-superset)
 - [🔧 Key Technologies](#-key-technologies)
 - [📃 License](#-license)
 
@@ -90,6 +90,10 @@ aws-end-to-end-data-lakehouse-analytics-platform/
 │   └── data_pipeline/
 │
 ├── _004_docs/                    # Documentation
+|
+├── docker/
+|
+├── image/                    
 │
 ├── docker-compose.dmt.yml        # PostgreSQL & pgAdmin
 ├── docker-compose.grafana.yml   # Grafana & Prometheus
@@ -101,45 +105,58 @@ aws-end-to-end-data-lakehouse-analytics-platform/
 
 ## 📚 Dataset
 ### Customer search data log
-Dữ liệu được dùng cho dự án này là dữ liệu customer searching được log từ 1 online entertainment platforms có thể dùng trên nhiều thiết bị (máy tính, điện thoại, Tivi,...) từ ngày 2022-06-01 đến ngày 2022-06-03. Dữ liệu cho biết được lịch sử searching của customer trong thời gian sử dụng dịch vụ trên nền tảng với cấu trúc và ý nghĩa như sau:
+The dataset used in this project consists of customer search activity logs collected from an online entertainment platform that is accessible across multiple device types, including desktop, mobile, and smart TV devices.
+The data covers the period from 2022-06-01 to 2022-06-03.
 
-| Field          | Description                                                          |
-| -------------- | -------------------------------------------------------------------- |
-| event_time     | Mã ID duy nhất cho mỗi sự kiện log                                   |
-| datetime       | Thời điểm sự kiện xảy ra (timestamp)                                 |
-| user_id        | ID người dùng (có thể None nếu chưa đăng nhập / guest)               |
-| keyword        | Từ khoá user sử dụng để search                                       |
-| category       | Loại hành vi (enter / quit ) — có thể là trạng thái session          |
-| proxy_isp      | Nhà mạng / ISP mà user sử dụng (fpt / vnpt / viettel/ other / spt)   |
-| platform       | Thiết bị / hệ điều hành (android / ios / smarttv-sony-android…)      |
-| networkType    | Loại kết nối ('wifi', 'WWAN', 'ethernet','3g', ...)                  |
-| action         | Hành động chính (search)                                             |
-| userPlansMap   | Danh sách gói dịch vụ hiện tại của user                              |
+This dataset captures the search behavior history of users during their interaction with the platform, providing detailed information about search events, user context, device characteristics, and network attributes. The structure and semantic meaning of the dataset are described as follows:
+
+| Field          | Description                                                                  |
+| -------------- | ---------------------------------------------------------------------------- |
+| event_time     | Unique identifier for each logged event                                      |
+| datetime       | Timestamp indicating when the event occurred                                 |
+| user_id        | User identifier (may be null for unauthenticated or guest users)             |
+| keyword        | Search keyword entered by the user                                           |
+| category       | Event category (e.g., enter, quit), representing session-related states      |
+| proxy_isp      | Internet service provider used by the user (FPT, VNPT, Viettel, SPT, other)  |
+| platform       | Device type or operating system (e.g., Android, iOS, SmartTV-Android)        |
+| networkType    | Network connection type (e.g., WiFi, WWAN, Ethernet, 3G)                     |
+| action         | Primary user action (search)                                                 |
+| userPlansMap   | List of active subscription plans associated with the user                   |
 
 ![customer_search_log_data](/image/customer_search_log_data.png)
 <p align="center">
   <em>Customer Search Log Data Sample</em>
 </p>
 
-### Crawled data from film website
-Dữ liệu được crawl từ 1 web film online, dữ liệu được dùng để chuẩn hóa dữ liệu search của customer bằng thuật toán Machine Learning để có thể chuẩn hóa dữ liệu search ví dụ như: có 2 user đều tìm phim Doraemon, trong đó user_1 search ký tự 'doramon' (mất chữ 'e') và user_2 search ký tự 'doremon' (mất chữ 'a') thì dựa vào việc áp dụng ML, từ khóa của 2 user này sẽ được chuẩn hóa về loại phim đúng cần tìm là 'Doraemon'.
+### Crawled Movie Dataset
+The dataset is crawled from an online movie streaming website and is used as a reference dataset for normalizing customer search queries by applying Machine Learning–based text normalization and matching techniques.
 
-Cấu trúc của dữ liệu crawl về là:
+The goal of this dataset is to standardize noisy or misspelled user search inputs into their correct canonical movie titles.
+For example, two users may search for the same movie Doraemon using slightly different misspellings:
+
+- user_1 searches for "doramon" (missing the letter e)
+
+- user_2 searches for "doremon" (missing the letter a)
+
+By applying ML-based similarity matching and normalization algorithms, both search queries are mapped to the correct canonical movie title: "Doraemon".
+This process improves search accuracy, user experience, and downstream analytical consistency.
+
+The structure of the crawled movie dataset is as follows:
 
 | Field          | Description                                                          |
 | -------------- | -------------------------------------------------------------------- |
-| _id            | ID định danh duy nhất của bộ phim                                    |
-| title          | Tên phim hiển thị cho người dùng (Tiếng việt)                        |
-| slug           | Chuỗi định danh thân thiện với URL (SEO-friendly)                    |
-| original_title | Tên gốc của phim theo ngôn ngữ sản xuất                              |
-| release_date   | Ngày phim chính thức phát hành hoặc bắt đầu chiếu                    |
-| status         | Trạng thái phát hành của phim                                        |
-| quality        | Chất lượng video cao nhất hiện có                                    |
-| rating         | Phân loại độ tuổi người xem (Age Rating)                             |
-| runtime        | Thời lượng mỗi tập hoặc toàn bộ phim                                 |
-| overview       | Mô tả ngắn / tóm tắt nội dung phim                                   |
-| origin_country | Quốc gia sản xuất phim                                               |
-| genres         | Thể loại phim                                                        |
+| _id            | Unique identifier of the movie                                       |
+| title          | Display title shown to users (Vietnamese)                            |
+| slug           | URL-friendly, SEO-optimized identifier derived from the movie title  |
+| original_title | Original title of the movie in its production language               |
+| release_date   | Official release or premiere date                                    |
+| status         | Movie release status                                                 |
+| quality        | Highest available video quality                                      |
+| rating         | Audience age rating classification                                   |
+| runtime        | Duration per episode or total runtime of the movie                   |
+| overview       | Short synopsis or summary of the movie content                       |
+| origin_country | Country of origin or production                                      |
+| genres         | Movie genres                                                         |
 
 ![crawled_data](/image/crawled_data.png)
 <p align="center">
@@ -151,13 +168,18 @@ Cấu trúc của dữ liệu crawl về là:
 ## 🌐 Architecture Overview
 ### 1. AWS Configuration (Infrastructure as Code - Terraform)
 
-Dự án này sử dụng Terraform như một công cụ Infrastructure as Code (IaC) để định nghĩa, cấu hình và quản lý hạ tầng cũng như các tài nguyên đám mây trên AWS (bao gồm Amazon S3 và Amazon Redshift), nhằm tạo ra các môi trường nhất quán, được kiểm soát phiên bản và có thể tái tạo một cách tự động.
+This project uses **Terraform** as an **Infrastructure as Code (IaC)** tool to define, provision, and manage cloud infrastructure and AWS resources—such as **Amazon S3** and **Amazon Redshift**—in a consistent, version-controlled, and fully reproducible manner.
+
+Terraform enables automated infrastructure provisioning, ensures environment consistency across deployments, and supports infrastructure changes through declarative configuration.
 
 1. [🔨 Infrastructure Code – Configure AWS Architecture using Terraform](/_001_iac/terraform/)
 
-Tài liệu mô tả chi tiết cách tổ chức mã nguồn, cấu hình tài nguyên AWS được áp dụng trong Terraform cho dự án này:
+This section contains the Terraform codebase that defines the AWS infrastructure architecture and resource configurations used in this project.
 
 2. [📃 Documents - Terraform Documentation](/_004_docs/README-terraform.md)
+
+This document provides detailed explanations of the Terraform project structure, resource definitions, and configuration strategies applied in this implementation.
+
 
 Directory Structure:
 
@@ -187,23 +209,30 @@ dbt Datamart (PostgreSQL)
 BI Tools (Superset)
 ```
 
-Dự án này triển khai kiến ​​trúc xử lý hàng loạt phân tán mạnh mẽ sử dụng PySpark để tính toán và Apache Airflow để điều phối. Bên cạnh đó, Apache Iceberg is used as the table format on Amazon S3, providing enterprise-grade capabilities such as ACID transactions, time travel, schema evolution, and partition evolution, ensuring reliable and maintainable datasets. Các chức năng cốt lõi được cấu trúc như sau:
+This project implements a robust distributed batch processing architecture, leveraging PySpark as the core computation engine and Apache Airflow for workflow orchestration.
+In addition, Apache Iceberg is used as the table format on Amazon S3, providing enterprise-grade capabilities such as ACID transactions, time travel, schema evolution, and partition evolution, ensuring reliable, scalable, and maintainable datasets.
+
+The core components are organized as follows:
 
 
 1. [🔨 Code – Data Pipeline (OLTP -> Data Lakehouse & Data Warehouse)](/_002_src/orchestration/data_pipeline/)
 
 2. [📃 Documents - Data Lakehouse & Warehouse Architecture Documentation](/_004_docs/README-data-lakehouse-&-warehouse-architecture.md)
 
-Dữ liệu hàng ngày sẽ được sử lý dựa trên Pyspark, dữ liệu được xử lý qua 3 tầng theo mô hình Medallion Architecture , where data is processed sequentially across three layers: **Bronze, Silver, and Gold**. This architectural approach ensures data quality, consistency, scalability, and end-to-end data lineage throughout the entire pipeline. At the Gold layer, data is modeled using a star schema with fact and dimension tables, enabling the construction of subject-oriented datamarts** that efficiently support OLAP analysis and BI reporting. Apache Iceberg được sử dụng làm định dạng bảng trên Amazon S3 ở Gold Layer, cung cấp các khả năng cấp doanh nghiệp như ACID transactions, time travel, schema evolution, and partition evolution, ensuring reliable and maintainable datasets.
+3. [📃 Documents - Apache Iceberg Documentation](/_004_docs/README-iceberg.md)
+
+Daily batch data is processed using PySpark following the Medallion Architecture, where data flows sequentially through three layers: Bronze, Silver, and Gold. This layered processing model ensures data quality, consistency, scalability, and end-to-end data lineage across the entire pipeline. Raw data is first ingested into the Bronze layer, cleansed and enriched in the Silver layer, and finally curated in the Gold layer for analytical consumption.
+
+At the Gold layer, datasets are modeled using a star schema with fact and dimension tables, enabling the creation of subject-oriented analytical datasets that efficiently support OLAP workloads and BI reporting. Data at this layer is stored on Amazon S3 using Apache Iceberg as the table format, providing enterprise-grade capabilities such as ACID transactions, time travel, schema evolution, and partition evolution, ensuring reliable and maintainable datasets over time.
 
 <p align="center">
   <img src="/image/Medallion_Architect.png" alt="Medallion Architect" />
 </p>
 
-3. [🔨 Code – Scheduling based on Airflow (DAGs)](/_002_src/orchestration/dags/)
-4. [📃 Documents - Airflow Documentation](/_004_docs/README-airflow.md)
+4. [🔨 Code – Scheduling based on Airflow (DAGs)](/_002_src/orchestration/dags/)
+5. [📃 Documents - Airflow Documentation](/_004_docs/README-airflow.md)
 
-Toàn bộ quy trình xử lý hàng loạt được tự động hóa thông qua Apache Airflow, với các DAG được lên lịch chạy hàng đêm lúc 2:00 sáng. Bộ lập lịch điều phối 2 Dags bao gồm DAG 'data_pipeline_daily' dùng để chạy các job data pipeline hàng ngày (bao gồm đọc dữ liệu từ nguồn, xử lý dữ liệu qua các tầng và mô hình hóa dữ liệu) và DAG 'redshift_to_postgre' dùng để replicate dữ liệu từ tầng Gold về PostgreSQL để dùng cho việc xây dựng Datamart và visualization.
+The entire batch processing workflow is fully automated and orchestrated using Apache Airflow. Airflow DAGs are scheduled to run daily at 1:00 AM, coordinating all stages of the data pipeline—from source data ingestion and transformation across Medallion layers to data modeling and publishing. The workflow includes a primary DAG (`data_pipeline_daily`) responsible for executing daily PySpark jobs and a downstream DAG (`redshift_to_postgre`) that replicates curated Gold-layer data into PostgreSQL, where it is further used for datamart construction, analytics, and BI visualization.
 
 Directory Structure:
 
@@ -230,8 +259,56 @@ orchestration/
 ```
 
 ### 3. Monitoring & Observability
+To ensure system observability and operational scalability, the project integrates Grafana and Prometheus for real-time monitoring of Airflow clusters and PostgreSQL performance, supporting performance tuning and capacity planning.
+
+1. [🔨 Code – Grafana and Prometheus Docker Compose](/docker-compose.grafana.yml)
+2. [🔨 Dashboard – Grafana Airflow Cluster and Postgres Dashboards](/_002_src/monitoring/grafana/)
+3. [📃 Documents - Grafana Documentation](/_004_docs/README-grafana.md)
+
+![grafana_home](/image/grafana_home.png)
+
 ### 4. Datamart for business analytics and reporting
+The datamart is built from Gold-layer data to support reporting and user behavior analysis on the platform.
+
+1. [🔨 Code – Build Datamart by using DBT](/_002_src/build_datamart/dbt_customer_behaviour_analytics_dmt/)
+2. [📃 Documents - DBT and Building Datamart Documentation](/_004_docs/README-dbt.md)
+
+![dbt_dodbt_lineage_graphcs_ui](/image/dbt_lineage_graph.png)
+
+Directory Structure:
+```
+build_datamart/ 
+│
+├── profile.yml
+├── requirements.txt
+└── dbt_customer_behaviour_analytics_dmt/
+         │
+         ├── dbt_project.yml
+         ├── models/
+         │   ├── source/
+         │   │   └── gold_sources.yml
+         │   ├── dmt_search_event_base.sql
+         │   ├── dmt_search_event_category.sql
+         │   ├── dmt_search_event_plan.sql
+         │   └── schema.yml
+         │
+         ├── tests/
+         ├── macros/
+         ├── seeds/
+         ├── snapshots/
+         └── analyses/
+```
+
 ### 5. Business Intelligence & Visualization
+The project leverages Apache Superset for data visualization and reporting. Apache Superset is an open-source, cost-efficient business intelligence (BI) platform that helps organizations significantly reduce licensing costs compared to commercial solutions such as Tableau or Power BI. It is designed to handle large-scale (Big Data) workloads, integrating seamlessly with modern, cloud-native, and distributed data systems while maintaining high query performance.
+
+Superset offers a rich and extensible visualization library, ranging from basic charts to advanced analytical visualizations, enabling deep data exploration and insight discovery. Additionally, its high extensibility through custom visualization plugins allows teams to develop and integrate domain-specific visual components tailored to specific business requirements. With a flexible and user-friendly interface, Superset empowers both technical and non-technical users to explore data and build interactive dashboards using drag-and-drop functionality, without requiring programming knowledge.
+
+1. [🔨 Code – Apache Superset Docker Compose](/docker-compose.superset.yml)
+2. [📃 Documents - Business Intelligence & Visualization by Apache Superset Documentation](/_004_docs/README-superset.md)
+
+You can access the dashboard at the following link: 👉 [Customer_Behaviour_Analyst_Dashboard](https://misfashioned-premonarchial-nguyet.ngrok-free.dev/superset/dashboard/12)
+
 ---
 ## 🚀 Quick Start Guide
 
@@ -248,7 +325,7 @@ Configure AWS access using one of the following methods (recommended: AWS CLI pr
 aws configure
 ```
 
-Then, điền các thông tin này dựa trên thông tin AWS credentials của bạn:
+Then, fill the following information using your AWS credentials:
 
 ```
 AWS Access Key ID: {AWS_ACCESS_KEY_ID} 
@@ -554,6 +631,8 @@ dbt docs serve
 - `dmt_search_event_plan`
 - `dmt_search_event_category`
 
+![dbt_docs_ui](/image/dbt_docs_ui.png)
+
 ![datamart](/image/datamart.png)
 
 
@@ -561,17 +640,17 @@ dbt docs serve
 
 ---
 
-### Step 10: Visualize data by Apache Superset and Reporting
-Thực hiện lấy dữ liệu từ Data Warehouse và Datamart để visualize thực hiện báo cáo để từ đó get insight từ hành vi của user để từ đó có thể đưa ra được các quyết định, chính sách hợp lý để nâng cao số lượng người đăng ký, nâng cao chất lượng người dùng và phát triển lợi nhuận của doanh nghiệp.
+### Step 10: Business Intelligence & Visualization by Apache Superset
+Data is retrieved from the Data Warehouse and Datamart layers to power analytical dashboards and reports, enabling the visualization and analysis of user behavior patterns. These insights support data-driven decision-making, allowing the business to define effective strategies and policies aimed at increasing user subscriptions, enhancing user experience and engagement, and driving sustainable revenue growth.
 
-You can access the dashboard from the link: [Customer_Behaviour_Analyst_Dashboard](https://misfashioned-premonarchial-nguyet.ngrok-free.dev/superset/dashboard/12)
+You can access the dashboard at the following link: 👉 [Customer_Behaviour_Analyst_Dashboard](https://misfashioned-premonarchial-nguyet.ngrok-free.dev/superset/dashboard/12)
 
 ![superset_dashboard](/image/superset_dashboard.jpg)
 <p align="center">
   <em>Customer Behaviour Analyst Dashboard</em>
 </p>
 
-**📖 Detailed Documentation:** See [Visualize by using Apache Superset and Report](_004_docs/)
+**📖 Detailed Documentation:** See [Business Intelligence & Visualization by Apache Superset](/_004_docs/README-superset.md)
 
 ---
 
@@ -584,6 +663,7 @@ You can access the dashboard from the link: [Customer_Behaviour_Analyst_Dashboar
 | Apache Iceberg | 1.5.2 | Open table format for ACID transactions |
 | AWS Redshift Serverless | Latest | Serverless data warehouse |
 | AWS S3 | - | Object storage for data lake |
+| AWS Glue Data Catalog | - | Managed metastore / catalog |
 | PostgreSQL | 15 | Metadata DB and BI datamart |
 | dbt | Latest | Data transformation and modeling |
 | Grafana | Latest | Metrics visualization |
