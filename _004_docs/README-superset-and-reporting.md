@@ -32,7 +32,7 @@ The Superset project structure is minimal as most configuration is handled via D
 aws-end-to-end-data-lakehouse-analytics-platform/
 │
 ├── _002_src/
-│   └── bi_assets/
+│   └── business_intelligence/
 │       └── dashboards.zip      # Exported dashboards & charts for import
 ├── docker-compose.superset.yml
 └── docker/
@@ -118,7 +118,7 @@ Key benefits:
 ### 2. Start Apache Superset with Docker Compose
 This command launches Apache Superset and its dependent services in detached mode.
 ```bash
-docker-compose -f docker-compose.superset.yml up -d
+docker compose -f docker-compose.superset.yml up -d
 ```
 - ```-f docker-compose.superset.yml``` Specifies a custom Docker Compose configuration file dedicated to Superset deployment.
 - ```up``` Creates and starts all containers defined in the compose file.
@@ -146,9 +146,15 @@ docker-compose -f docker-compose.superset.yml up -d
 
 This step allows you to import predefined dashboards into Apache Superset using a ZIP bundle (exported dashboards, datasets, charts, and metadata).
 
-**Copy dashboard bundle into Superset container**
-
 From your project root, run:
+
+```bash
+cd _002_src/business_intelligence
+```
+
+This ensures you are in the directory containing the dashboards.zip file.
+
+**Copy dashboard bundle into Superset container**
 
 ```bash
 docker cp dashboards.zip superset_app:/app/dashboards.zip
@@ -186,8 +192,7 @@ superset import-dashboards -p /app/dashboards.zip -u admin
 
 will be automatically restored into Superset.
 
-<img width="698" height="2048" alt="image" src="https://github.com/user-attachments/assets/822a5089-1e66-4508-82d4-1b1e5ba13e47" />
-
+![superset_dashboard](https://github.com/user-attachments/assets/86e03ad8-2d3f-4384-9cc6-953bef073d2c)
 
 ## 📉 Dataset Overview
 
@@ -251,11 +256,16 @@ The dashboard is designed to visualize user search behavior on the entertainment
 #### Total Login User & Total Search (Big Number)
 These indicators represent the total number of logged-in users and the total number of search events within the analysis period, providing a high-level overview of data volume and overall system activity.
 
+<img width="499" height="175" alt="superset_dashboard_detail_1" src="https://github.com/user-attachments/assets/20010256-fd13-48cc-8304-48bfcd492dca" />
+
+
 #### Local-international distribution & Top network name (Donut Chart)
 *   **Local-international distribution:** Illustrates the proportion of users from local versus international regions.
 *   **Top network name:** Shows the distribution of access by internet service providers, including Viettel, VNPT, FPT, and others.
 
 Together, these charts describe user access characteristics from both geographic and network infrastructure perspectives.
+
+<img width="949" height="282" alt="superset_dashboard_detail_2" src="https://github.com/user-attachments/assets/34b849f8-7cc6-4449-8ba4-cfcf184a5526" />
 
 #### Search volume x user state (Stacked Area Chart)
 This chart presents search volume over time, segmented by user state at the time of search (guest, login, plan).
@@ -263,6 +273,8 @@ This chart presents search volume over time, segmented by user state at the time
 *   **Colored Layers:** Indicate the contribution of each user group.
 
 The visualization supports tracking temporal changes in search behavior and comparing activity levels across user segments.
+
+<img width="591" height="468" alt="superset_dashboard_detail_3" src="https://github.com/user-attachments/assets/abbfb28e-c836-4304-9fe6-db7ae04e8b68" />
 
 #### Search Behavior by Time & Category (Heatmap)
 The heatmap illustrates the relationship between time of day and content categories.
@@ -272,9 +284,18 @@ The heatmap illustrates the relationship between time of day and content categor
 
 This visualization highlights the distribution of search activity across both temporal and content dimensions.
 
+<img width="837" height="496" alt="superset_dashboard_detail_4" src="https://github.com/user-attachments/assets/27e17f54-b2d5-450f-9fdc-a83b0af173ba" />
+
 #### Category Word Cloud & Top Keyword (Word Cloud)
 *   **Category Word Cloud:** Visualizes content categories based on their frequency of occurrence, where larger font sizes correspond to higher search volumes.
+
+<img width="1430" height="430" alt="superset_dashboard_detail_5" src="https://github.com/user-attachments/assets/f6ff96b7-253a-4e7a-a2d7-a0be93f7cc4a" />
+
+  
 *   **Top Keyword Word Cloud:** Displays the most frequently searched keywords, reflecting user interests at a more granular level.
+
+<img width="1460" height="581" alt="superset_dashboard_detail_6" src="https://github.com/user-attachments/assets/69539bef-7079-4a71-bcef-186a119ba983" />
+
 
 #### Top 10 Category × Device & Top Plan × Plan Type (Stacked Bar Chart)
 *   **Top 10 Category × Device:** Shows the ten most searched content categories segmented by device type (mobile, web, smart TV, etc.).
@@ -287,24 +308,48 @@ This visualization highlights the distribution of search activity across both te
 
 These charts describe content consumption across platforms and the distribution of users across subscription models.
 
+<img width="1459" height="459" alt="superset_dashboard_detail_7" src="https://github.com/user-attachments/assets/573711d1-44ad-4cf5-b905-9283921d33a3" />
+
 ### User Segmentation Analysis
-Users are divided into three main groups. For each group, the dashboard uses heatmaps to visualize peak activity times and word clouds to represent the most searched content categories.
+Users are divided into two main groups. For each group, the dashboard uses heatmaps to visualize peak activity times and word clouds to represent the most searched content categories.
 
 1.  **Login User**
    
 **Core User:** Logged-in users with an active subscription plan (`user_state_at_search` = ‘plan’).
 
+*  **Peaktime (Core User):** This heatmap visualizes search activity of core users (logged-in users with an active subscription plan) across different time slots and content categories.
+
+*   **Category Word Cloud:** Visualizes content categories based on their frequency of occurrence, where larger font sizes correspond to higher search volumes, specifically reflecting search behavior of logged-in users.
+
+<img width="1470" height="404" alt="superset_dashboard_detail_8" src="https://github.com/user-attachments/assets/b71e7f98-ae32-472d-ab00-029d131f7217" />
+
+
 **Ready-to-Convert User:** Top 30% of logged-in users without a subscription plan, ranked by highest search volume.
+
+*  **Peaktime (Ready-to-Convert User):** This heatmap visualizes search activity of Ready-to-Convert users (Top 30% noplan logged-in users by search volume) across different time slots and content categories.
+
+
+*   **Category Word Cloud (Ready-to-Convert User):** Visualizes content categories based on their frequency of occurrence, where larger font sizes correspond to higher search volumes, specifically reflecting search behavior of Ready-to-Convert User.
+
+<img width="1472" height="400" alt="superset_dashboard_detail_9" src="https://github.com/user-attachments/assets/7f8c00e1-ed6f-43e5-9277-f37be7ac1f77" />
 
 2. **Guest:** User not logged in.
 
-#### Guest Analysis Specifics
-For the Guest group, an additional **Stacked Bar Chart (Top Category × Device Type)** is included to present search volumes by content category, segmented by device type such as mobile, smart TV, web, and OTT box.
+
+*  **Peaktime (Guest):** This heatmap visualizes search activity of guest (non-logged-in users) across different time slots and content categories.
+
+*   **Category Word Cloud (Guest):** Visualizes content categories based on their frequency of occurrence, where larger font sizes correspond to higher search volumes, specifically reflecting search behavior of non-logged-in users.
+  
+<img width="1469" height="398" alt="superset_dashboard_detail_10" src="https://github.com/user-attachments/assets/861b7ddd-590e-4587-b64b-765b9694c0da" />
+
+*   **Stacked Bar Chart (Top Category × Device Type)** is included to present search volumes by content category, segmented by device type such as mobile, smart TV, web, and OTT box.
 *   **X-axis:** Content categories.
 *   **Y-axis:** Total searches.
 *   **Colored Segments:** Different device types.
 
 This chart provides a combined view of content distribution and device usage among non-logged-in users.
+
+<img width="1458" height="382" alt="superset_dashboard_detail_11" src="https://github.com/user-attachments/assets/00fe1238-3e81-4114-b1ac-d3695995e85a" />
 
 
 ---
@@ -313,3 +358,6 @@ This chart provides a combined view of content distribution and device usage amo
 -   [Apache Superset Documentation](https://superset.apache.org/docs/intro)
 -   [Superset on Docker Compose](https://superset.apache.org/docs/installation/docker-compose)
 -   [Connecting to Databases](https://superset.apache.org/docs/databases/installing-database-drivers)
+
+
+
