@@ -139,7 +139,34 @@ File `data_pipeline/_01_config/data_storage_config.py` contains:
   - Host, port, database
   - Schema name (`dwh_user_search`)
 
-### 3. Spark Configuration
+
+### 3. Add jar files to `jars/`
+Required JAR files:
+
+***Note: You can download necessary jar files in there: [link_download_jar_files](https://drive.google.com/drive/folders/1Zrt93rD2rQUBtt0DtvQGiP25Brtyy4or?usp=sharing)***
+
+```bash
+Redshift:
+redshift-jdbc42-2.2.1.jar
+spark-redshift_2.12-4.2.0.jar
+
+S3/AWS:
+hadoop-aws-3.3.4.jar
+aws-java-sdk-bundle-1.12.262.jar
+
+Iceberg:
+iceberg-spark-runtime-3.5_2.12-1.4.3.jar
+iceberg-aws-bundle-1.5.2.jar
+
+PostgreSQL:
+postgresql-42.7.3.jar
+
+Spark:
+spark-avro_2.12-3.5.1.jar
+```
+
+
+### 4. Spark Configuration
 
 Each task has its own Spark config:
 
@@ -165,6 +192,7 @@ conf = {
 1. Docker & Docker Compose
 2. AWS credentials configured (`.env.aws` file)
 3. Network `aws_e2e_network` already created
+
 
 ### 1. Build Docker Image
 

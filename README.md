@@ -480,6 +480,31 @@ Edit `_002_src/orchestration/data_pipeline/_01_config/data_storage_config.py`:
 - Update `REDSHIFT_HOST`, `REDSHIFT_DB`, credentials
 - Update `REDSHIFT_IAM_ROLE_ARN` with your IAM role ARN
 
+####  4.3 Add jar files to `jars/`
+You need to add required JAR files to folder `jars/`:
+
+***Note: You can download necessary jar files in there: [link_download_jar_files](https://drive.google.com/drive/folders/1Zrt93rD2rQUBtt0DtvQGiP25Brtyy4or?usp=sharing)***
+
+```bash
+Redshift:
+redshift-jdbc42-2.2.1.jar
+spark-redshift_2.12-4.2.0.jar
+
+S3/AWS:
+hadoop-aws-3.3.4.jar
+aws-java-sdk-bundle-1.12.262.jar
+
+Iceberg:
+iceberg-spark-runtime-3.5_2.12-1.4.3.jar
+iceberg-aws-bundle-1.5.2.jar
+
+PostgreSQL:
+postgresql-42.7.3.jar
+
+Spark:
+spark-avro_2.12-3.5.1.jar
+```
+
 ---
 
 ### Step 5: Build and Start Airflow
