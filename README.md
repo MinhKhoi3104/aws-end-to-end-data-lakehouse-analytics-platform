@@ -1,7 +1,7 @@
 # 🚀 AWS End-to-End Data Lakehouse Analytics Platform
 
 <p align="center">
-  <a href="https://github.com/MinhKhoi3104/aws-end-to-end-data-lakehouse-analytics-platform#-quick-start-guide">
+  <a href="https://github.com/MinhKhoi3104/aws-end-to-end-data-lakehouse-analytics-platform?tab=readme-ov-file#-quick-start-guide">
   <img src="https://img.shields.io/badge/project-🚀quick_start-blue?style=for-the-badge&logo=github" alt="Quick Start Guide"/>
 </a>
   <a href="https://github.com/MinhKhoi3104/aws-end-to-end-data-lakehouse-analytics-platform/tree/main/_002_src">
