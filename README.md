@@ -1,7 +1,7 @@
 # 🚀 AWS End-to-End Data Lakehouse Analytics Platform
 
 <p align="center">
-  <a href="https://github.com/MinhKhoi3104/aws-end-to-end-data-lakehouse-analytics-platform/tree/main?tab=readme-ov-file#-quick-start-guide">
+  <a href="https://github.com/MinhKhoi3104/aws-end-to-end-data-lakehouse-analytics-platform#-quick-start-guide">
   <img src="https://img.shields.io/badge/project-🚀quick_start-blue?style=for-the-badge&logo=github" alt="Quick Start Guide"/>
 </a>
   <a href="https://github.com/MinhKhoi3104/aws-end-to-end-data-lakehouse-analytics-platform/tree/main/_002_src">
@@ -22,6 +22,7 @@
   <img src="https://img.shields.io/badge/Grafana-Latest-F46800?style=plastic&logo=grafana&logoColor=white"/>
   <img src="https://img.shields.io/badge/Prometheus-2.38.0-E6522C?style=plastic&logo=prometheus&logoColor=white"/>
   <img src="https://img.shields.io/badge/Terraform-%3E%3D1.0-844FBA?style=plastic&logo=terraform&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Docker-Containerized-2496ED?style=plastic&logo=docker&logoColor=white"/>
 </p>
 
 
@@ -77,6 +78,7 @@ aws-end-to-end-data-lakehouse-analytics-platform/
 ├── _002_src/                     # Source code
 │   ├── build_datamart/          # dbt project
 │   │   └── dbt_customer_behaviour_analytics_dmt/
+|   ├── business_intelligence/   # Visualization
 │   ├── crawl_web_data/          # Web scraping scripts
 │   ├── monitoring/              # Grafana & Prometheus configs
 │   │   ├── config/
@@ -84,10 +86,19 @@ aws-end-to-end-data-lakehouse-analytics-platform/
 │   └── orchestration/           # Airflow DAGs and ETL jobs
 │       ├── dags/
 │       ├── data_pipeline/
-│       └── jars/
+│       ├── jars/
+│       ├── docker-compose.orchestration.yml
+│       └── Dockerfile
 │
 ├── _003_test/                    # Test utilities
-│   └── data_pipeline/
+│   ├── config/
+|   ├── processing_layer/
+│   │   ├── bronze/
+│   │   ├── silver/
+│   │   └── gold/
+|   ├── utils/
+|   ├── spark_connect_redshift.py
+│   └── spark_connect_s3.py
 │
 ├── _004_docs/                    # Documentation
 |
@@ -97,7 +108,8 @@ aws-end-to-end-data-lakehouse-analytics-platform/
 │
 ├── docker-compose.dmt.yml        # PostgreSQL & pgAdmin
 ├── docker-compose.grafana.yml   # Grafana & Prometheus
-├── docker-compose.orchestration.yml # Airflow (in orchestration/)
+├── docker-compose.superset.yml   # Superset
+├── LICENSE
 └── README.md                     # This file
 ```
 
@@ -229,8 +241,14 @@ At the Gold layer, datasets are modeled using a star schema with fact and dimens
   <img src="/image/Medallion_Architect.png" alt="Medallion Architect" />
 </p>
 
-4. [🔨 Code – Scheduling based on Airflow (DAGs)](/_002_src/orchestration/dags/)
-5. [📃 Documents - Airflow Documentation](/_004_docs/README-airflow.md)
+![aws_lakehouse_architecture](/image/aws_lakehouse_architecture.png)
+<p align="center">
+  <em>AWS Data Lakehouse Architecture</em>
+</p>
+
+4. [🔨 Code – Apache Airflow Docker Compose](/_002_src/orchestration/docker-compose.orchestration.yml)
+5. [🔨 Code – Scheduling based on Airflow (DAGs)](/_002_src/orchestration/dags/)
+6. [📃 Documents - Airflow Documentation](/_004_docs/README-airflow.md)
 
 The entire batch processing workflow is fully automated and orchestrated using Apache Airflow. Airflow DAGs are scheduled to run daily at 1:00 AM, coordinating all stages of the data pipeline—from source data ingestion and transformation across Medallion layers to data modeling and publishing. The workflow includes a primary DAG (`data_pipeline_daily`) responsible for executing daily PySpark jobs and a downstream DAG (`redshift_to_postgre`) that replicates curated Gold-layer data into PostgreSQL, where it is further used for datamart construction, analytics, and BI visualization.
 
@@ -270,8 +288,9 @@ To ensure system observability and operational scalability, the project integrat
 ### 4. Datamart for business analytics and reporting
 The datamart is built from Gold-layer data to support reporting and user behavior analysis on the platform.
 
-1. [🔨 Code – Build Datamart by using DBT](/_002_src/build_datamart/dbt_customer_behaviour_analytics_dmt/)
-2. [📃 Documents - DBT and Building Datamart Documentation](/_004_docs/README-dbt.md)
+1. [🔨 Code – Datamart PostgreSQL Docker Compose](/docker-compose.dmt.yml)
+2. [🔨 Code – Build Datamart by using DBT](/_002_src/build_datamart/dbt_customer_behaviour_analytics_dmt/)
+3. [📃 Documents - DBT and Building Datamart Documentation](/_004_docs/README-dbt.md)
 
 ![dbt_dodbt_lineage_graphcs_ui](/image/dbt_lineage_graph.png)
 
@@ -305,9 +324,10 @@ The project leverages Apache Superset for data visualization and reporting. Apac
 Superset offers a rich and extensible visualization library, ranging from basic charts to advanced analytical visualizations, enabling deep data exploration and insight discovery. Additionally, its high extensibility through custom visualization plugins allows teams to develop and integrate domain-specific visual components tailored to specific business requirements. With a flexible and user-friendly interface, Superset empowers both technical and non-technical users to explore data and build interactive dashboards using drag-and-drop functionality, without requiring programming knowledge.
 
 1. [🔨 Code – Apache Superset Docker Compose](/docker-compose.superset.yml)
-2. [📃 Documents - Business Intelligence & Visualization by Apache Superset Documentation](/_004_docs/README-superset.md)
+2. [📃 Dashboard Zip - Visualization File Zip](/_002_src/business_intelligence/)
+3. [📃 Documents - Business Intelligence & Visualization by Apache Superset Documentation](/_004_docs/README-superset-and-reporting.md)
 
-You can access the dashboard at the following link: 👉 [Customer_Behaviour_Analyst_Dashboard](https://misfashioned-premonarchial-nguyet.ngrok-free.dev/superset/dashboard/12)
+![superset_dashboard_list](/image/superset_dashboard_list.png)
 
 ---
 ## 🚀 Quick Start Guide
@@ -643,14 +663,39 @@ dbt docs serve
 ### Step 10: Business Intelligence & Visualization by Apache Superset
 Data is retrieved from the Data Warehouse and Datamart layers to power analytical dashboards and reports, enabling the visualization and analysis of user behavior patterns. These insights support data-driven decision-making, allowing the business to define effective strategies and policies aimed at increasing user subscriptions, enhancing user experience and engagement, and driving sustainable revenue growth.
 
-You can access the dashboard at the following link: 👉 [Customer_Behaviour_Analyst_Dashboard](https://misfashioned-premonarchial-nguyet.ngrok-free.dev/superset/dashboard/12)
+#### 10.1 Run Apache Superset
+```bash
+docker compose -f docker-compose.superset.yml up -d --build
+```
+
+#### 10.2 Copy dashboard bundle into Superset container
+```bash
+cd _002_src/business_intelligence &&
+docker cp dashboards.zip superset_app:/app/dashboards.zip
+```
+
+#### 10.3 Access Superset container
+
+```bash
+docker exec -it superset_app bash
+```
+
+This opens an interactive shell inside the Superset container.
+
+#### 10.4 Import dashboards via Superset CLI
+
+Inside the container, execute:
+
+```bash
+superset import-dashboards -p /app/dashboards.zip -u admin
+```
 
 ![superset_dashboard](/image/superset_dashboard.jpg)
 <p align="center">
   <em>Customer Behaviour Analyst Dashboard</em>
 </p>
 
-**📖 Detailed Documentation:** See [Business Intelligence & Visualization by Apache Superset](/_004_docs/README-superset.md)
+**📖 Detailed Documentation:** See [Business Intelligence & Visualization by Apache Superset](/_004_docs/README-superset-and-reporting.md)
 
 ---
 
