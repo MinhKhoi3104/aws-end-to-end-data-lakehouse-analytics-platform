@@ -118,7 +118,7 @@ Key benefits:
 ### 2. Start Apache Superset with Docker Compose
 This command launches Apache Superset and its dependent services in detached mode.
 ```bash
-docker compose -f docker-compose.superset.yml up -d
+docker compose -f docker-compose.superset.yml up -d --build
 ```
 - ```-f docker-compose.superset.yml``` Specifies a custom Docker Compose configuration file dedicated to Superset deployment.
 - ```up``` Creates and starts all containers defined in the compose file.
@@ -128,28 +128,7 @@ docker compose -f docker-compose.superset.yml up -d
 -   **URL**: [http://localhost:8089](http://localhost:8089)
 -   **Login**: `admin` / `admin` (default)
 
-### 4. Development Workflow
-
-**Step 1: Connect to Database**
-*   Go to **Settings** -> **Database Connections**.
-*   Add a new database
-*   Connect Superset to PostgreSQL
-
-![superset_connect_a_database](/image/superset_connect_a_database.png)
-
-**Step 2: Create a Dataset**
-*   Go to **Datasets** -> **+ Dataset**.
-*   Select your Database, Schema, and Table.
-*   Ex: Choose table `dim_date`
-
-![superset_dataset](/image/superset_add_dataset.png)
-
-*   Select all the tables below:
-
-![superset_dataset](/image/superset_dataset.png)
-
-
-**Step 3: Import Pre-built Dashboards**
+### 4. Import Pre-built Dashboards
 
 This step allows you to import predefined dashboards into Apache Superset using a ZIP bundle (exported dashboards, datasets, charts, and metadata).
 
